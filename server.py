@@ -21,7 +21,6 @@ def decrypt_list(file_contents):
   return plaintext.decode().split(',')
 
 def fetchS3():
-  string = "AQICAHgFXi2TEB5uhOUXl62UNxtALVzp0EqotGT2an02XqvQvQEbGhtGPFdR1bijMkptTEeCAAAAcjBwBgkqhkiG9w0BBwagYzBhAgEAMFwGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMfvTtz8ZENLeae1q8AgEQgC97EoFlyzEPMg1G44M/323T50eFnbYTq69Z6dNEQ/+o+WWpLRiZMmUO4/TA87fabA=="
 
   s3 = boto3.resource('s3')
 
