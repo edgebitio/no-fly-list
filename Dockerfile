@@ -7,6 +7,7 @@ COPY requirements.txt /opt/app
 RUN pip3 install --no-cache-dir -r /opt/app/requirements.txt
 
 COPY server.py /opt/app
+COPY encrypt.py /opt/app
 
 ENV FLASK_APP=/opt/app/server.py
 EXPOSE 8001

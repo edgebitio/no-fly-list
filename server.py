@@ -6,42 +6,48 @@ from flask import request
 from flask import jsonify
 import base64
 import boto3
+from cryptography.fernet import Fernet
 
 app = Flask(__name__)
 
-def decrypt_list(file_contents):
+def decrypt_envelope(envelope):
 
-  session = boto3.session.Session()
-  kms = session.client('kms')
+  # Get a KMS client
+  client = boto3.client("kms")
 
-  binary_data = base64.b64decode(file_contents)
-  meta = kms.decrypt(CiphertextBlob=binary_data)
-  plaintext = meta[u'Plaintext']
+  # Decrypt the data key from the data_key column
+  decrypted_key = client.decrypt(CiphertextBlob=base64.b64decode(envelope["data-key-ciphertext-base64"]))
+
+  # Encode decrypted key to base64
+  plain_data_key = base64.b64encode(decrypted_key['Plaintext'])
+
+  # Use the plaintext key to decrypt the user name data
+  f = Fernet(plain_data_key)
+  plaintext = f.decrypt(envelope["aes-ciphertext-base64"])
 
   return plaintext.decode().split(',')
 
-def fetchS3():
-
+def fetch_S3_envelope():
   s3 = boto3.resource('s3')
 
   # This object has a public access policy
-  obj = s3.Object('no-fly-list', 'no-fly-encrypted.txt')
-  return obj.get()['Body'].read().decode('utf-8')
+  obj = s3.Object('no-fly-list', 'no-fly-envelope.txt')
+  return json.loads(obj.get()['Body'].read().decode('utf-8'))
 
-# Fetch the encrypted No-Fly list stored on S3
-encrypted_base64_contents = fetchS3()
+# Fetch the encrypted No-Fly list stored as envelope on S3
+encrypted_envelope = fetch_S3_envelope()
 
 # Decrypt the No-Fly list
 # Enclaver will attach the cryptographic attestation of this enclave to the request
 # The KMS key has an access policy that explictly allows this attestation access to the key
-plaintext_nofly_list = decrypt_list(encrypted_base64_contents)
+plaintext_nofly_list = decrypt_envelope(encrypted_envelope)
 
 @app.route('/')
 def index():
   return jsonify("https://edgebit.com/enclaver/docs/0.x/guide-app/")
 
 @app.route('/enclave/passenger', methods=['GET'])
-def decrypt():
+def decrypt():  
 
   # Format the potential passenger's name
   # The No-Fly list already been normalized to remove spaces and force lower case
