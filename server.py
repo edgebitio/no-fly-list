@@ -28,6 +28,14 @@ def fetchS3():
   obj = s3.Object('no-fly-list', 'no-fly-encrypted.txt')
   return obj.get()['Body'].read().decode('utf-8')
 
+# Fetch the encrypted No-Fly list stored on S3
+encrypted_base64_contents = fetchS3()
+
+# Decrypt the No-Fly list
+# Enclaver will attach the cryptographic attestation of this enclave to the request
+# The KMS key has an access policy that explictly allows this attestation access to the key
+plaintext_nofly_list = decrypt_list(encrypted_base64_contents)
+
 @app.route('/')
 def index():
   return jsonify("https://edgebit.com/enclaver/docs/0.x/guide-app/")
@@ -35,18 +43,10 @@ def index():
 @app.route('/enclave/passenger', methods=['GET'])
 def decrypt():
 
-  # Fetch the encrypted No-Fly list stored on S3
-  encrypted_base64_contents = fetchS3()
-
   # Format the potential passenger's name
   # The No-Fly list already been normalized to remove spaces and force lower case
   orig_name = request.args.get('name')
   name = ''.join(orig_name.split()).lower()
-
-  # Decrypt the No-Fly list
-  # Enclaver will attach the cryptographic attestation of this enclave to the request
-  # The KMS key has an access policy that explictly allows this attestation access to the key
-  plaintext_nofly_list = decrypt_list(encrypted_base64_contents)
 
   # Compare our name to the unencrypted list
   if name in plaintext_nofly_list:
