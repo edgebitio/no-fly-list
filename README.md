@@ -6,7 +6,11 @@ The info below is just for building and testing the demo app.
 
 ## Container Images
 
-TODO: build and publish these publicly
+Containers are built on merge with GitHub Actions and stored on Google:
+
+```
+us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest
+```
 
 ## Running Locally
 
