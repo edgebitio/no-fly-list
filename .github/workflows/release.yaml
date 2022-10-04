@@ -23,6 +23,9 @@ jobs:
           workload_identity_provider: 'projects/77991489452/locations/global/workloadIdentityPools/gh-actions-identity-pool/providers/gh-actions-identity-provider'
           service_account: 'github-actions-service-account@edgebit-containers.iam.gserviceaccount.com'
 
+      - name: Add commit short sha
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
+
       - name: Configure Docker Auth
         run: |
           gcloud auth configure-docker us-docker.pkg.dev
@@ -30,4 +33,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest
+          tags: us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:${{ env.SHORT_SHA }}
