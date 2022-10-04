@@ -33,4 +33,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:${{ env.SHORT_SHA }}
+          tags: us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:${{ env.SHORT_SHA }},us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest
