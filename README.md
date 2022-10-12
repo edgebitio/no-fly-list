@@ -15,7 +15,7 @@ us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest
 ## Running Locally
 
 ```
-docker build -t demo-enclave -f Dockerfile . && docker run --name enclave -d -p 8001:8001 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=us-east-1 -e PYTHONUNBUFFERED=1 --rm demo-enclave
+docker build -t demo-enclave -f Dockerfile . && docker run --name enclave -d -p 8001:8001 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=us-east-1 --rm demo-enclave
 ```
 
 ## Updating the No Fly List
@@ -38,7 +38,7 @@ fullname,anothername
 3. Start the container but overrride the `FLASK_APP`:
 
 ```
-docker build -t demo-enclave -f Dockerfile . && docker run --name enclave -d -p 8001:8001 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=us-east-1 -e PYTHONUNBUFFERED=1 -e FLASK_APP=/opt/app/encrypt.py --rm demo-enclave 
+docker build -t demo-enclave -f Dockerfile . && docker run --name enclave -d -p 8001:8001 -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=us-east-1 -e FLASK_APP=/opt/app/encrypt.py --rm demo-enclave 
 ```
 
 3. Curl it to encrypt and uplaod it to S3:
