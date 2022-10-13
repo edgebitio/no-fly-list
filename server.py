@@ -44,7 +44,7 @@ plaintext_nofly_list = decrypt_envelope(encrypted_envelope)
 
 @app.route('/')
 def index():
-  return jsonify("https://edgebit.com/enclaver/docs/0.x/guide-app/")
+  return jsonify("https://edgebit.io/enclaver/docs/0.x/guide-app/")
 
 @app.route('/enclave/passenger', methods=['GET'])
 def decrypt():  

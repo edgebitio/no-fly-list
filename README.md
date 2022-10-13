@@ -1,6 +1,6 @@
 # No Fly List Enclave Example App
 
-Read the full guide to using this app at https://edgebit.com/enclaver/docs/0.x/guide-app/
+Read the full guide to using this app at https://edgebit.io/enclaver/docs/0.x/guide-app/
 
 The info below is just for building and testing the demo app.
 
