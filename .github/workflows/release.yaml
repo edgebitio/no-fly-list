@@ -55,5 +55,5 @@ jobs:
           ./enclaver build -f enclaver.yaml
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
-          docker images
           docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
+          docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
