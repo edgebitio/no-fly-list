@@ -14,6 +14,8 @@ jobs:
       id-token: 'write'
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -34,3 +36,24 @@ jobs:
         with:
           push: true
           tags: us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:${{ env.SHORT_SHA }},us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest
+
+        # This is really hacky but will be replaced with actions/download-artifact@v3 once we have public release binaries 
+      - name: Extract Enclaver binary from container
+        shell: bash
+        run: |
+          image="us-docker.pkg.dev/edgebit-containers/containers/enclaver-wrapper-base:latest"
+          source_path="/usr/local/bin/enclaver"
+          destination_path="./enclaver"
+
+          container_id=$(docker create "$image")
+          docker cp "$container_id:$source_path" "$destination_path"
+          docker rm "$container_id"
+
+      - name: Enclaver Build & Tag
+        shell: bash
+        run: |
+          ./enclaver build -f enclaver.yaml
+          docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
+          docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
+          docker images
+          docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
