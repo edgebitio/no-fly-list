@@ -1,0 +1,13 @@
+version: v1
+name: "test"
+target: "no-fly-list:enclave-latest"
+sources:
+  app: "us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest"
+defaults:
+  memory_mb: 4096
+egress:
+  allow:
+    - kms.*.amazonaws.com
+    - no-fly-list.s3.us-east-1.amazonaws.com
+ingress:
+  - listen_port: 8001
