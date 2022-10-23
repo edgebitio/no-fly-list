@@ -17,7 +17,7 @@ def decrypt_envelope(envelope):
   if(os.environ.get('AWS_KMS_ENDPOINT')):
     client = boto3.client("kms", endpoint_url=os.environ.get('AWS_KMS_ENDPOINT'))
   else:
-     client = boto3.client("kms");
+    client = boto3.client("kms");
 
   # Decrypt the data key from the data_key column
   decrypted_key = client.decrypt(CiphertextBlob=base64.b64decode(envelope["data-key-ciphertext-base64"]))
