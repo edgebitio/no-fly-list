@@ -11,6 +11,7 @@ COPY encrypt.py /opt/app
 
 ENV FLASK_APP=/opt/app/server.py
 ENV PYTHONUNBUFFERED=1
+ENV AWS_DEFAULT_REGION=us-east-1
 
 EXPOSE 8001
 ENTRYPOINT ["python"]
