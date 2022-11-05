@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}
+
 jobs:
   publish-images:
     runs-on: ubuntu-latest
@@ -41,17 +44,12 @@ jobs:
           push: true
           tags: us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:${{ env.SHORT_SHA }},us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest
 
-        # This is really hacky but will be replaced with actions/download-artifact@v3 once we have public release binaries 
-      - name: Extract Enclaver binary from container
-        shell: bash
-        run: |
-          image="us-docker.pkg.dev/edgebit-containers/containers/enclaver-wrapper-base:latest"
-          source_path="/usr/local/bin/enclaver"
-          destination_path="./enclaver"
-
-          container_id=$(docker create "$image")
-          docker cp "$container_id:$source_path" "$destination_path"
-          docker rm "$container_id"
+      - name: Install Enclaver
+        uses: jaxxstorm/action-install-gh-release@v1.5.0
+        with:
+          repo: edgebitio/enclaver
+          platform: linux
+          arch: x86-64
 
       - name: Enclaver Build & Tag
         shell: bash
