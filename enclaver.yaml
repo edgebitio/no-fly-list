@@ -4,7 +4,7 @@ target: "no-fly-list:enclave-latest"
 sources:
   app: "us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:latest"
 defaults:
-  memory_mb: 4096
+  memory_mb: 3000
 kms_proxy:
   listen_port: 9999
 egress:
