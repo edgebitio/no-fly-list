@@ -57,6 +57,7 @@ jobs:
         shell: bash
         run: |
           gzip -d enclaver-linux-x86_64-v0.1.0.tar.gz
+          ls -la
           ./enclaver-linux-x86_64-v0.1.0/enclaver build -f enclaver.yaml
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
