@@ -1,0 +1,17 @@
+{
+    "Sid": "Allow public use of the key for no-fly-list demo (SHORT_SHA)",
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": "*"
+    },
+    "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+    ],
+    "Resource": "*",
+    "Condition": {
+        "StringEqualsIgnoreCase": {
+            "kms:RecipientAttestation:PCR0": "INSERT_PCR_VALUE"
+        }
+    }
+}

@@ -53,12 +53,33 @@ jobs:
           target: 'enclaver-linux-x86_64-v0.2.0.tar.gz'
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::970625735569:role/GithubActionsKMSPolicyUpdate
+
       - name: Enclaver Build & Tag
         shell: bash
         run: |
           tar -xzf enclaver-linux-x86_64-v0.2.0.tar.gz
-          ./enclaver-linux-x86_64-v0.1.0/enclaver build -f enclaver.yaml
+          ./enclaver-linux-x86_64-v0.2.0/enclaver build -f enclaver.yaml
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
-          docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
-          docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
+        # docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
+        # docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
+
+      - name: Gather PCR values
+        run: |
+          docker cp no-fly-list:enclave-latest:/enclave/application.eif application.eif
+          ./enclaver-linux-x86_64-v0.2.0/enclaver enclaver-run describe-eif --eif-path application.eif > eif.txt
+          cat eif.txt
+          cat eif.txt | tail -n -7 | jq -r '.Measurements.PCR0' >> $PCR0
+
+      # - name: Update key policy with PCR values
+      #   run: |
+      #     aws kms get-key-policy --key-id mrk-39c14bd4d71f40e390fc158fab0697dd --policy-name "default" --output json | jq -r '.Policy' > existing-policy.json
+      #     sed 's/SHORT_SHA/$SHORT_SHA/g' pcr-policy-stub.json
+      #     sed 's/INSERT_PCR_VALUE/$PCR0/g' pcr-policy-stub.json
+      #     cat existing-policy.json | jq --argjson groupInfo "$(<pcr-policy-stub.json)" '.Statement += [$groupInfo]' > new-policy.json
+      #     aws kms put-key-policy --key-id mrk-39c14bd4d71f40e390fc158fab0697dd --policy-name "default" --policy "$(cat new-policy.json)"
