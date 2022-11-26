@@ -13,7 +13,7 @@ app = Flask(__name__)
 def push_S3(envelope):
 
   s3 = boto3.resource('s3')
-  object = s3.Object('no-fly-list', 'no-fly-envelope.txt')
+  object = s3.Object('edgebit-no-fly-list', 'no-fly-envelope.txt')
 
   object.put(
       Body=(bytes(json.dumps(envelope).encode('UTF-8')))
@@ -25,7 +25,7 @@ def encrypt_envelope(list):
   client = boto3.client("kms")
 
   # Generate a new data key
-  response = client.generate_data_key(KeyId="mrk-b3152356da604a7dac485a0a272957c7", KeySpec="AES_256")
+  response = client.generate_data_key(KeyId="mrk-39c14bd4d71f40e390fc158fab0697dd", KeySpec="AES_256")
 
   # The response includes both plaintext and encrypted versions of the data key
   plain_data_key = base64.b64encode(response["Plaintext"])
