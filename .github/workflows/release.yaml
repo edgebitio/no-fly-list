@@ -71,15 +71,13 @@ jobs:
 
       - name: Gather PCR values
         run: |
-          docker cp no-fly-list:enclave-latest:/enclave/application.eif application.eif
-          ./enclaver-linux-x86_64-v0.2.0/enclaver enclaver-run describe-eif --eif-path application.eif > eif.txt
-          cat eif.txt
-          cat eif.txt | tail -n -7 | jq -r '.Measurements.PCR0' >> $PCR0
+          echo "PCRO=`echo ${docker run --entrypoint enclaver-run no-fly-list:enclave-latest describe-eif | tail -n -7 | jq -r '.Measurements.PCR0'}`" >> $GITHUB_ENV
 
-      # - name: Update key policy with PCR values
-      #   run: |
-      #     aws kms get-key-policy --key-id mrk-39c14bd4d71f40e390fc158fab0697dd --policy-name "default" --output json | jq -r '.Policy' > existing-policy.json
-      #     sed 's/SHORT_SHA/$SHORT_SHA/g' pcr-policy-stub.json
-      #     sed 's/INSERT_PCR_VALUE/$PCR0/g' pcr-policy-stub.json
-      #     cat existing-policy.json | jq --argjson groupInfo "$(<pcr-policy-stub.json)" '.Statement += [$groupInfo]' > new-policy.json
+      - name: Update key policy with PCR values
+        run: |
+          aws kms get-key-policy --key-id mrk-39c14bd4d71f40e390fc158fab0697dd --policy-name "default" --output json | jq -r '.Policy' > existing-policy.json
+          sed 's/SHORT_SHA/$SHORT_SHA/g' pcr-policy-stub.json
+          sed 's/INSERT_PCR_VALUE/$PCR0/g' pcr-policy-stub.json
+          cat existing-policy.json | jq --argjson groupInfo "$(<pcr-policy-stub.json)" '.Statement += [$groupInfo]' > new-policy.json
+          cat new-policy.json
       #     aws kms put-key-policy --key-id mrk-39c14bd4d71f40e390fc158fab0697dd --policy-name "default" --policy "$(cat new-policy.json)"
