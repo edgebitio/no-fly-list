@@ -66,8 +66,8 @@ jobs:
           ./enclaver-linux-x86_64-v0.2.0/enclaver build -f enclaver.yaml
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
-        # docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
-        # docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
+        #  docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
+        #  docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
 
       - name: Gather PCR values
         run: |
@@ -76,8 +76,8 @@ jobs:
       - name: Update key policy with PCR values
         run: |
           aws kms get-key-policy --key-id mrk-39c14bd4d71f40e390fc158fab0697dd --policy-name "default" --output json | jq -r '.Policy' > existing-policy.json
-          sed -i 's/SHORT_SHA/$SHORT_SHA/g' pcr-policy-stub.json
-          sed -i 's/INSERT_PCR_VALUE/$PCR0/g' pcr-policy-stub.json
-          cat existing-policy.json | jq --argjson groupInfo "$(<pcr-policy-stub.json)" '.Statement += [$groupInfo]' > new-policy.json
+          sed -i 's/SHORT_SHA/'"$SHORT_SHA"'/g' pcr-policy-stub.json
+          sed -i 's/INSERT_PCR_VALUE/'"$PCR0"'/g' pcr-policy-stub.json
+          cat existing-policy.json | jq --argjson stub "$(<pcr-policy-stub.json)" '.Statement += [$stub]' > new-policy.json
           cat new-policy.json
       #     aws kms put-key-policy --key-id mrk-39c14bd4d71f40e390fc158fab0697dd --policy-name "default" --policy "$(cat new-policy.json)"
