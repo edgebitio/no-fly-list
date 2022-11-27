@@ -66,7 +66,7 @@ jobs:
           ./enclaver-linux-x86_64-v0.2.0/enclaver build -f enclaver.yaml
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
           docker tag no-fly-list:enclave-latest us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
-        # docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
+          docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-latest
           docker push us-docker.pkg.dev/edgebit-containers/containers/no-fly-list:enclave-${{ env.SHORT_SHA }}
 
       - name: Gather PCR values
