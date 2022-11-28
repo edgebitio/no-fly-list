@@ -35,7 +35,7 @@ def fetch_S3_envelope():
   s3 = boto3.resource('s3')
 
   # This object has a public access policy
-  obj = s3.Object('no-fly-list', 'no-fly-envelope.txt')
+  obj = s3.Object('edgebit-no-fly-list', 'no-fly-envelope.txt')
   return json.loads(obj.get()['Body'].read().decode('utf-8'))
 
 # Fetch the encrypted No-Fly list stored as envelope on S3
