@@ -14,9 +14,12 @@ def decrypt_envelope(envelope):
 
   # Get a KMS client
   # Check if the enclave's KMS proxy is configured
-  if(os.environ.get('AWS_KMS_ENDPOINT')):
-    client = boto3.client("kms", endpoint_url=os.environ.get('AWS_KMS_ENDPOINT'))
+  kms_endpoint = os.environ.get('AWS_KMS_ENDPOINT')
+  if kms_endpoint:
+    print("KMS proxy configured at ", kms_endpoint)
+    client = boto3.client("kms", endpoint_url=kms_endpoint)
   else:
+    print("KMS proxy is NOT configured")
     client = boto3.client("kms");
 
   # Decrypt the data key from the data_key column
@@ -27,19 +30,12 @@ def decrypt_envelope(envelope):
 
   # Use the plaintext key to decrypt the user name data
   f = Fernet(plain_data_key)
-  plaintext = f.decrypt(envelope["aes-ciphertext-base64"])
+  plaintext = f.decrypt(envelope["aes-ciphertext-base64"].encode())
 
   return plaintext.decode().split(',')
 
-def fetch_S3_envelope():
-  s3 = boto3.resource('s3')
-
-  # This object has a public access policy
-  obj = s3.Object('edgebit-no-fly-list', 'no-fly-envelope.txt')
-  return json.loads(obj.get()['Body'].read().decode('utf-8'))
-
-# Fetch the encrypted No-Fly list stored as envelope on S3
-encrypted_envelope = fetch_S3_envelope()
+# Fetch the encrypted No-Fly list stored in a file
+encrypted_envelope = json.load(open('/opt/app/no-fly-envelope.json'))
 
 # Decrypt the No-Fly list
 # Enclaver will attach the cryptographic attestation of this enclave to the request
