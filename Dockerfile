@@ -7,7 +7,7 @@ COPY requirements.txt /opt/app
 RUN pip3 install --no-cache-dir -r /opt/app/requirements.txt
 
 COPY server.py /opt/app
-COPY encrypt.py /opt/app
+COPY no-fly-envelope.json /opt/app
 
 ENV FLASK_APP=/opt/app/server.py
 ENV PYTHONUNBUFFERED=1

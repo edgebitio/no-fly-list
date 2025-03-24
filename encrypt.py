@@ -1,26 +1,10 @@
-import os
 import json
-from flask import Flask
-from flask import render_template
-from flask import request
-from flask import jsonify
 import base64
+import sys
 import boto3
 from cryptography.fernet import Fernet
 
-app = Flask(__name__)
-
-def push_S3(envelope):
-
-  s3 = boto3.resource('s3')
-  object = s3.Object('edgebit-no-fly-list', 'no-fly-envelope.txt')
-
-  object.put(
-      Body=(bytes(json.dumps(envelope).encode('UTF-8')))
-  )
-
-def encrypt_envelope(list):
-
+def encrypt_envelope(plaintext):
   # Get a KMS client
   client = boto3.client("kms")
 
@@ -33,31 +17,22 @@ def encrypt_envelope(list):
 
   # Use the plaintext key to encrypt our data, and then throw it away
   f = Fernet(plain_data_key)
-  crypted = f.encrypt(bytes(list, 'utf-8'))
+  crypted = f.encrypt(bytes(plaintext, 'utf-8'))
 
-  envelope = {}
-  envelope["data-key-ciphertext-base64"] = encrypted_data_key.decode()
-  envelope["aes-ciphertext-base64"] = crypted.decode()
+  return {
+    "data-key-ciphertext-base64": encrypted_data_key.decode(),
+    "aes-ciphertext-base64": crypted.decode()
+  }
 
-  return envelope
-
-@app.route('/')
-def index():
-  return jsonify("https://edgebit.com/enclaver/docs/0.x/guide-app/")
-
-@app.route('/enclave/encrypt', methods=['POST'])
-def encrypt():  
-
+def main():
   # Read the list
-  plaintext_list = request.form["list"]
+  plaintext_list = sys.stdin.read()
 
   # Encrypt an envelope
   encrypted_envelope = encrypt_envelope(plaintext_list)
 
-  # Upload it to S3
-  push_S3(encrypted_envelope)
-
-  return encrypted_envelope
+  # Write to stdout
+  json.dump(encrypted_envelope, sys.stdout)
 
 if __name__ == '__main__':
-    app.run(port=os.getenv('PORT', 8000))
+    main()
